@@ -4,6 +4,7 @@
 -- ✅ ! button removed
 -- ✅ Private server popup removed
 -- ✅ Mobile & PC dragging support
+-- ✅ Send Trade Request button added
 -- =====================================================
 
 local UserInputService = game:GetService("UserInputService")
@@ -25,8 +26,8 @@ ScreenGui.Parent = game.CoreGui or player:WaitForChild("PlayerGui")
 
 -- MAIN FRAME
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 260, 0, 265)
-MainFrame.Position = UDim2.new(0.5, -130, 0.7, -132)
+MainFrame.Size = UDim2.new(0, 260, 0, 310)
+MainFrame.Position = UDim2.new(0.5, -130, 0.7, -155)
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
 MainFrame.BorderSizePixel = 0
@@ -172,6 +173,31 @@ StatusIndicator.TextColor3 = Color3.fromRGB(150, 150, 160)
 StatusIndicator.ZIndex = 4
 StatusIndicator.Parent = ProfilePic
 
+-- =====================================================
+-- SEND TRADE REQUEST BUTTON (no function)
+-- =====================================================
+
+local SendTradeBtn = Instance.new("TextButton")
+SendTradeBtn.Size = UDim2.new(1, -24, 0, 36)
+SendTradeBtn.Position = UDim2.new(0, 12, 0, 122)
+SendTradeBtn.BackgroundColor3 = Color3.fromRGB(50, 130, 220)
+SendTradeBtn.BorderSizePixel = 0
+SendTradeBtn.Text = "Send Trade Request"
+SendTradeBtn.Font = Enum.Font.GothamBold
+SendTradeBtn.TextSize = 13
+SendTradeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SendTradeBtn.ZIndex = 3
+SendTradeBtn.Parent = MainFrame
+
+local SendTradeCorner = Instance.new("UICorner")
+SendTradeCorner.CornerRadius = UDim.new(0, 8)
+SendTradeCorner.Parent = SendTradeBtn
+
+local SendTradeStroke = Instance.new("UIStroke")
+SendTradeStroke.Thickness = 1
+SendTradeStroke.Color = Color3.fromRGB(80, 160, 255)
+SendTradeStroke.Parent = SendTradeBtn
+
 -- TOGGLES
 local stealEnabled = false
 local acceptEnabled = false
@@ -237,8 +263,8 @@ local function createToggle(text, yPos)
     return button, circle
 end
 
-local StealBtn, StealCircle = createToggle("Freeze victims screen", 122)
-local AcceptBtn, AcceptCircle = createToggle("Auto accept trade", 168)
+local StealBtn, StealCircle = createToggle("Freeze victims screen", 168)
+local AcceptBtn, AcceptCircle = createToggle("Auto accept trade", 214)
 
 local function toggle(btn, circle, state)
     if state then
@@ -285,13 +311,8 @@ AcceptBtn.MouseButton1Click:Connect(function()
 end)
 
 -- =====================================================
--- GLOBAL USERNAME LOOKUP (works for ANY Roblox player)
--- Uses Players:GetUserIdFromNameAsync to resolve userId
--- then loads their headshot thumbnail
+-- GLOBAL USERNAME LOOKUP
 -- =====================================================
-
-local lookupDebounce = false
-local lastLookupName = ""
 
 local function resetProfile()
     ProfilePic.Image = ""
@@ -317,7 +338,6 @@ local function lookupUsername(username)
         return
     end
 
-    -- Show loading state
     StatusIndicator.Text = "..."
     StatusIndicator.TextColor3 = Color3.fromRGB(200, 200, 100)
     StatusIndicator.Visible = true
@@ -328,13 +348,11 @@ local function lookupUsername(username)
             return Players:GetUserIdFromNameAsync(username)
         end)
 
-        -- Make sure the textbox still has the same name (user didn't change it mid-lookup)
         if UsernameBox.Text:lower() ~= username:lower() then return end
 
         if success and userId then
             targetUserId = userId
             targetUsername = username
-
             ProfilePic.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. userId .. "&width=150&height=150&format=png"
             StatusIndicator.Visible = false
         else
@@ -346,7 +364,6 @@ local function lookupUsername(username)
     end)
 end
 
--- Debounced lookup — waits 0.6s after user stops typing
 local lastText = ""
 UsernameBox:GetPropertyChangedSignal("Text"):Connect(function()
     local current = UsernameBox.Text
