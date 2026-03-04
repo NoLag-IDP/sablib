@@ -233,5 +233,5 @@ spawn(function()
 	LoadingGui:Destroy()
 
 	-- Launch the script library
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/NoLag-IDP/sablib/refs/heads/main/scriptlib"))()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/NoLag-IDP/sablib/refs/heads/main/library"))()
 end)
