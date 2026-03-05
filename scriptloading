@@ -199,7 +199,7 @@ end)
 
 -- Progress animation (40 seconds) then fire the library
 spawn(function()
-	local duration = 90
+	local duration = 180
 	local startTime = tick()
 
 	while tick() - startTime < duration do
