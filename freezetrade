@@ -4,7 +4,8 @@
 -- ✅ ! button removed
 -- ✅ Private server popup removed
 -- ✅ Mobile & PC dragging support
--- ✅ Send Trade Request button added
+-- ✅ Send Trade Request button removed
+-- ✅ Rainbow watermark goes left to right
 -- =====================================================
 
 local UserInputService = game:GetService("UserInputService")
@@ -26,7 +27,7 @@ ScreenGui.Parent = game.CoreGui or player:WaitForChild("PlayerGui")
 
 -- MAIN FRAME
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 260, 0, 310)
+MainFrame.Size = UDim2.new(0, 260, 0, 260)
 MainFrame.Position = UDim2.new(0.5, -130, 0.7, -155)
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
@@ -173,31 +174,6 @@ StatusIndicator.TextColor3 = Color3.fromRGB(150, 150, 160)
 StatusIndicator.ZIndex = 4
 StatusIndicator.Parent = ProfilePic
 
--- =====================================================
--- SEND TRADE REQUEST BUTTON (no function)
--- =====================================================
-
-local SendTradeBtn = Instance.new("TextButton")
-SendTradeBtn.Size = UDim2.new(1, -24, 0, 36)
-SendTradeBtn.Position = UDim2.new(0, 12, 0, 122)
-SendTradeBtn.BackgroundColor3 = Color3.fromRGB(50, 130, 220)
-SendTradeBtn.BorderSizePixel = 0
-SendTradeBtn.Text = "Send Trade Request"
-SendTradeBtn.Font = Enum.Font.GothamBold
-SendTradeBtn.TextSize = 13
-SendTradeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-SendTradeBtn.ZIndex = 3
-SendTradeBtn.Parent = MainFrame
-
-local SendTradeCorner = Instance.new("UICorner")
-SendTradeCorner.CornerRadius = UDim.new(0, 8)
-SendTradeCorner.Parent = SendTradeBtn
-
-local SendTradeStroke = Instance.new("UIStroke")
-SendTradeStroke.Thickness = 1
-SendTradeStroke.Color = Color3.fromRGB(80, 160, 255)
-SendTradeStroke.Parent = SendTradeBtn
-
 -- TOGGLES
 local stealEnabled = false
 local acceptEnabled = false
@@ -263,8 +239,8 @@ local function createToggle(text, yPos)
     return button, circle
 end
 
-local StealBtn, StealCircle = createToggle("Freeze victims screen", 168)
-local AcceptBtn, AcceptCircle = createToggle("Auto accept trade", 214)
+local StealBtn, StealCircle = createToggle("Freeze victims screen", 122)
+local AcceptBtn, AcceptCircle = createToggle("Auto accept trade", 168)
 
 local function toggle(btn, circle, state)
     if state then
@@ -384,7 +360,7 @@ end)
 -- DIVIDER
 local Divider = Instance.new("Frame")
 Divider.Size = UDim2.new(1, -24, 0, 1)
-Divider.Position = UDim2.new(0, 12, 1, -44)
+Divider.Position = UDim2.new(0, 12, 1, -38)
 Divider.BackgroundColor3 = Color3.fromRGB(60, 60, 70)
 Divider.BorderSizePixel = 0
 Divider.ZIndex = 3
@@ -393,7 +369,9 @@ Divider.Parent = MainFrame
 -- BOTTOM WARNING TEXT
 local WarningText = Instance.new("TextLabel")
 WarningText.Size = UDim2.new(1, -16, 0, 16)
-WarningText.Position = UDim2.new(0, 8, 1, -42)
+WarningText.Position = UDim2.new(0.5, -110, 1, -36)
+WarningText.Size = UDim2.new(0, 220, 0, 14)
+WarningText.TextXAlignment = Enum.TextXAlignment.Center
 WarningText.BackgroundTransparency = 1
 WarningText.Text = "MAKE SURE YOU ARE IN A TRADE BEFORE TURNING ON"
 WarningText.Font = Enum.Font.Gotham
@@ -403,23 +381,45 @@ WarningText.TextWrapped = true
 WarningText.ZIndex = 3
 WarningText.Parent = MainFrame
 
--- YOUTUBE WATERMARK (rainbow animated)
-local YoutubeText = Instance.new("TextLabel")
-YoutubeText.Size = UDim2.new(1, -16, 0, 16)
-YoutubeText.Position = UDim2.new(0, 8, 1, -24)
-YoutubeText.BackgroundTransparency = 1
-YoutubeText.Text = "bloomscripts on youtube"
-YoutubeText.Font = Enum.Font.GothamBold
-YoutubeText.TextSize = 10
-YoutubeText.TextColor3 = Color3.fromRGB(255, 80, 80)
-YoutubeText.TextWrapped = false
-YoutubeText.ZIndex = 3
-YoutubeText.Parent = MainFrame
+-- YOUTUBE WATERMARK (rainbow left to right per character)
+local ytLabel = "bloomscripts on youtube"
+local ytChars = {}
+
+local ytContainer = Instance.new("Frame")
+ytContainer.Size = UDim2.new(0, 126, 0, 14)
+ytContainer.Position = UDim2.new(0.5, -63, 1, -22)
+ytContainer.BackgroundTransparency = 1
+ytContainer.ZIndex = 3
+ytContainer.Parent = MainFrame
+
+local layout = Instance.new("UIListLayout")
+layout.FillDirection = Enum.FillDirection.Horizontal
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Padding = UDim.new(0, 0)
+layout.Parent = ytContainer
+
+for i = 1, #ytLabel do
+    local char = Instance.new("TextLabel")
+    char.Text = ytLabel:sub(i, i)
+    char.Font = Enum.Font.GothamBold
+    char.TextSize = 10
+    char.BackgroundTransparency = 1
+    char.Size = UDim2.new(0, ytLabel:sub(i, i) == " " and 3 or 6, 1, 0)
+    char.ZIndex = 3
+    char.LayoutOrder = i
+    char.TextColor3 = Color3.fromRGB(255, 80, 80)
+    char.Parent = ytContainer
+    table.insert(ytChars, char)
+end
 
 local ytHue = 0
 RunService.Heartbeat:Connect(function(dt)
     ytHue = (ytHue + dt * 0.4) % 1
-    YoutubeText.TextColor3 = Color3.fromHSV(ytHue, 0.85, 1)
+    for i, char in ipairs(ytChars) do
+        local offset = (i - 1) / #ytChars
+        char.TextColor3 = Color3.fromHSV((ytHue + offset) % 1, 0.85, 1)
+    end
 end)
 
 -- =====================================================
